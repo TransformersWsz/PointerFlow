@@ -54,6 +54,7 @@
 		/* #ifndef APP-NVUE */
 		display: flex;
 		/* #endif */
+		
 		background-color: #ffffff;
 		position: relative;
 		flex-direction: column;

@@ -1,18 +1,28 @@
 <template>
-	<view >
-		
+	<view>
 		<uni-swipe-action style="margin-top: 30rpx;" v-for="(item, index) in listData" :key="index">
 			<uni-swipe-action-item :options="options" :show="isOpened" :auto-close="false" @click="swipeClick($event,index)">
 				<uni-list style="border-bottom-style: solid;border-bottom-width: 1px;">
-					<uni-list-item :title="`保存时间: ${turnTs2Datetime(item.saveTimestamp)}`" rightText="" :showMore="true" :showArrow="false" @clickIcon="clickIcon('asd')" />
+					<uni-list-item :title="`保存时间: ${turnTs2Datetime(item.saveTimestamp)}`" :showMore="true" :showArrow="false" @clickIcon="clickIcon('asd')" />
 				</uni-list>
 			</uni-swipe-action-item>
 			
 			<uni-list>
-				<uni-list-item v-for="(cg, idx) in item.recordData" :key="idx" :title="`计次 ${cg.count}`" :rightText="`${formatTime(cg.gap)}`" :showArrow="false" />
+				<uni-list-item title="最大值" :rightText="formatTime(compute(item.recordData)[0])" :showArrow="false"/>
+				<uni-list-item title="最小值" :rightText="formatTime(compute(item.recordData)[1])" :showArrow="false"/>
+				<uni-list-item title="平均值" :rightText="formatTime(compute(item.recordData)[2])" :showArrow="false"/>
+				<uni-list-item title="中位数" :rightText="formatTime(compute(item.recordData)[3])" :showArrow="false"/>
 			</uni-list>
-				
+			
+			<uni-collapse style="margin-top: 1px;">
+				<my-collapse-item title="总计次" :num="item.recordData.length">
+					<uni-list style="background-color: #f1f1f1;">
+						<uni-list-item v-for="(cg, idx) in item.recordData" :key="idx" :title="`计次 ${cg.count}`" :rightText="`${formatTime(cg.gap)}`" :showArrow="false" />
+					</uni-list>
+				</my-collapse-item>
+			</uni-collapse>
 		</uni-swipe-action>
+
 		
 		<view class="uni-padding-wrap uni-common-mt">
 			<view class="uni-loadmore" v-if="showListLoadMore">{{listLoadMoreText}}</view>
@@ -23,12 +33,8 @@
 </template>
 
 <script>
-	import uniIcons from '@/components/uni-icons/uni-icons.vue';
 	import util from "@/common/util.js";
 	export default {
-		components: {
-			uniIcons,
-		},
 		data() {
 			return {
 				isOpened: false,
@@ -48,7 +54,7 @@
 						backgroundColor: 'rgb(255,58,49)'
 					}
 				}],
-
+				
 				
 				listData: [],    // 列表数据
 				historyData: [],    // 缓存数据
@@ -86,6 +92,16 @@
 			this.initData();
 		},
 		methods: {
+			compute(recordData) {
+				let arr = recordData.map(item => item.gap);
+				arr.sort((a, b) => a-b);
+				console.log(arr);
+				const maxGap = arr[arr.length-1];
+				const minGap = arr[0];
+				const avgGap = (arr.reduce((prev,current,index,arr) => { return prev+current }) / arr.length).toFixed(2);
+				const midGap = arr[Math.floor(arr.length/2)];
+				return [maxGap, minGap, avgGap, midGap];
+			},
 			
 			formatTime(timestamp) {
 				return util.ms2msm(timestamp).slice(0, 8);
@@ -105,7 +121,6 @@
 			
 			swipeClick(e, index) {
 				let { content } = e;
-				console.log(index);
 				if (content.text === '删除') {
 					uni.showModal({
 						title: '提示',
@@ -212,6 +227,14 @@
 </script>
 
 <style>
+	.content {
+		padding: 15px;
+		font-size: 14px;
+		line-height: 20px;
+		background-color: #f9f9f9;
+		color: #666;
+	}
+	
 	.uni-icon-wrapper {
 		margin-right: 18rpx;
 	}
