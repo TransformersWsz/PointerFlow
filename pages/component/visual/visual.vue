@@ -9,21 +9,33 @@
 			 @touchmove="moveLineA" @touchend="touchEndLineA"></canvas>
 			<!-- 使用图表拖拽功能时，建议给canvas增加disable-scroll=true属性，在拖拽时禁止屏幕滚动 -->
 		</view>
+		
+		<view>
+			<uni-section title="统计结果" type="line"></uni-section>
+			<uni-list>
+				<uni-list-item title="最大值" :rightText="maxGap" :showArrow="false"/>
+				<uni-list-item title="最小值" :rightText="minGap" :showArrow="false"/>
+				<uni-list-item title="平均值" :rightText="avgGap" :showArrow="false"/>
+				<uni-list-item title="中位数" :rightText="minGap" :showArrow="false"/>
+			</uni-list>
+		</view>
+		
 	</view>
 
 </template>
 
 <script>
-	import {
-		mapGetters
-	} from 'vuex';
 	import uCharts from '@/components/u-charts/u-charts.js';
+	import util from "@/common/util.js";
 	var canvasObj = {};
 	var _self;
 	export default {
 		data() {
 			return {
-				timestamp: 0,
+				maxGap: 0,
+				minGap: 0,
+				avgGap: 0,
+				midGap: 0,
 				
 				cWidth: '',
 				cHeight: '',
@@ -64,10 +76,11 @@
 			}
 		},
 		onLoad(option) {
-			this.timestamp = option.timestamp;
-			const record = this.getRecordByTimestamp()(this.timestamp);
-			const categories = record["data"].map(item => `${item.count}`).reverse();
-			const data = record["data"].map(item => (item.gap/1000).toFixed(2)).reverse();
+			
+			let tempRecordData = uni.getStorageSync("tempRecordData");
+			const categories = tempRecordData.map(item => `${item.count}`).reverse();
+			const data = tempRecordData.map(item => (item.gap/1000).toFixed(2)).reverse();
+			this.compute(tempRecordData.map(item => parseFloat((item.gap/1000).toFixed(2))));
 			this.lineB = {
 				"categories": categories,
 				"series": [
@@ -77,8 +90,6 @@
 					}
 				]
 			};
-			// console.log(this.getTestvuex()(231232));
-			// console.log(this.getRecordByTimestamp()(this.timestamp));
 
 			_self = this;
 
@@ -97,7 +108,19 @@
 		},
 		
 		methods: {
-			...mapGetters(['getRecordByTimestamp', 'getTestvuex']),
+			formatTime(timestamp) {
+				return util.ms2msm(timestamp).slice(0, 8);
+			},
+			
+			compute(arr) {
+				arr.sort((a, b) => a-b);
+				console.log(arr);
+				this.maxGap = arr[arr.length-1].toFixed(2);
+				this.minGap = arr[0].toFixed(2);
+				this.avgGap = (arr.reduce((prev,current,index,arr) => { return prev+current }) / arr.length).toFixed(2);
+				this.midGap = arr[Math.floor(arr.length/2)].toFixed(2);
+			},
+			
 			showLineA(canvasId, chartData) {
 				canvasObj[canvasId] = new uCharts({
 					$this: _self,

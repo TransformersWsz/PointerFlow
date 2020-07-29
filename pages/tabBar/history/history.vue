@@ -162,8 +162,7 @@
 						for (let i = 0; i < strData.length; i++) {
 							copyData.push(`${strData[i]}\t\t${statistic}`);
 						}
-						copyData = copyData.reverse().join("\n")
-						console.log(copyData);
+						copyData = copyData.reverse().join("\n");
 						uni.setClipboardData({
 							data: copyData,
 							success: () => {

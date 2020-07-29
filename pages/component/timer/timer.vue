@@ -17,23 +17,24 @@
 			</view>
 		</view>
 		
-		<view>
+		<view id="recordTitle">
 			<uni-section style="font-size: 34rpx;" title="记录" type="line">
 				<button class="operation" type="primary" @tap="copyToClipboard">复制</button>
-				<button class="operation" type="primary" @tap="save">保存</button>
+				<button class="operation" type="primary" :disabled="isDisabled" @tap="save">保存</button>
 			</uni-section>
+		</view>
+		<scroll-view :scroll-top="0" scroll-y="true" :style="{height: scrollHeight}">
 			<uni-list>
 				<uni-list-item v-for="(item, index) in recordData" :key="index" :title="`计次 ${item.count}`" :rightText="formatTime(item.gap)" :showArrow="false"/>
 			</uni-list>
-		</view>
+		</scroll-view>
 
 	</view>
 </template>
 
 <script>
 	import uCharts from '@/components/u-charts/u-charts.js';
-	import util from "@/common/util.js";	
-	import { mapState, mapMutations, mapGetters } from 'vuex';
+	import util from "@/common/util.js";
 	
 	var _self;
 	var canvasObj = {};
@@ -41,6 +42,9 @@
 	export default {
 		data() {
 			return {
+				isDisabled: true,
+				scrollHeight: "300px",
+				
 				cWidth: '',
 				cHeight: '',
 				cWidth2: '', //横屏图表
@@ -52,12 +56,10 @@
 				itemCount: 30, //x轴单屏数据密度
 				sliderMax: 50,
 				
-				recordData: [],    // 掐表数据
-				
 				leftBtnText: "启动",
 				rightBtnText: "复位",
 				
-				
+				recordData: [],    // 掐表数据
 				isPaused: false,    // 是否出现过暂停
 				lastStartTimeStamp: 0,   // 上一次开始计时时间戳
 				cumulativeTimeStamp: 0,    // 累计时间戳，防止中途出现暂停，把暂停时间也算进去
@@ -101,27 +103,67 @@
 			this.cHeight3 = uni.upx2px(250);
 			this.arcbarWidth = uni.upx2px(24);
 			this.gaugeWidth = uni.upx2px(30);
+			
 		},
 		onReady() {
 			console.log("It is ready!");
 			_self.fillData(_self.localdata);
+			
+			this.setScrollHeight();
 		},
 		
 		onNavigationBarButtonTap(e) {
-			if (this.records[0]["data"].length == 0) {
+			if (this.recordData.length == 0) {
 				uni.showToast({
 					title: '您尚未记录任何数据',
 					icon: 'none'
 				});
 			}
 			else {
-				uni.navigateTo({
-					url: `/pages/component/visual/visual?timestamp=${this.records[0].timestamp}`
+				const tempRecordData = this.recordData.map(item => {
+					return {
+						"count": item.count, 
+						"gap": item.gap-item.gap%10
+					};
 				});
+				console.log(tempRecordData);
+				uni.setStorage({
+					key: "tempRecordData",
+					data: tempRecordData,
+					success: () => {
+						uni.navigateTo({
+							url: `/pages/component/visual/visual`
+						});
+					}
+				});
+				
 			}
 		},
 		
 		methods: {
+			setScrollHeight() {
+				const info = uni.getSystemInfoSync();
+				const windowHeight = info.windowHeight;
+				uni.createSelectorQuery().select('#recordTitle').fields({
+				   size: true,
+				   rect: true
+				}, (data) => {
+					const scrollHeight = windowHeight - data.bottom - 2;
+					this.scrollHeight = `${scrollHeight}px`;
+					console.log("设置成功！", this.scrollHeight);
+				}).exec();
+			},
+			getInfo() {
+				uni.createSelectorQuery().select('#next').fields({
+				   size: true,
+				   rect: true
+			   }, (data) => {
+					console.log(data);
+					console.log(typeof(data))
+			   }).exec();
+				const res = uni.getSystemInfoSync();
+				console.log(res.screenWidth, res.screenHeight, res.windowWidth, res.windowHeight, res.navigationBarHeight, res.statusBarHeight, res.titleBarHeight);
+			},
 			
 			formatTime(timestamp) {
 				return util.ms2msm(timestamp).slice(0, 8);
@@ -216,6 +258,7 @@
 				}
 				else {    // 暂停计时
 					this.pauseCal();
+					this.isDisabled = false;
 					this.leftBtnText = "启动";
 					this.rightBtnText = "复位";
 				}
@@ -419,6 +462,11 @@
 		overflow-x: hidden;
 	}
 	
+	.scroll-Y {
+		height: 0rpx;
+	}
+	
+	
 	.test {
 		margin-top: 8rpx;
 		width: 220rpx;
@@ -435,16 +483,7 @@
 		height: 80%;
 		margin-right: 10rpx;
 		font-size: 30rpx;
-	}
-	
-	button.success {
-		width: 220rpx;
-		height: 75rpx;
-		line-height: 75rpx;
-		font-size: 30rpx;
-		/* background-color: #4cd964; */
-	}
-	
+	}	
 
 	.qiun-columns {
 		display: flex;
