@@ -66,7 +66,7 @@
 		align-items: center;
 		padding: 0 10px;
 		height: 50px;
-		background-color: #f8f8f8;
+		background-color: #FFFFFF;
 		/* #ifdef APP-NVUE */
 		border-bottom-color: #e5e5e5;
 		border-bottom-style: solid;
@@ -98,7 +98,7 @@
 	}
 
 	.line {
-		height: 15px;
+		height: 20px;
 		background-color: #c0c0c0;
 		border-radius: 5px;
 		width: 3px;
@@ -121,7 +121,7 @@
 	}
 
 	.uni-section__content-title {
-		font-size: 14px;
+		font-size: 35rpx;
 		color: #333;
 	}
 

@@ -1,8 +1,5 @@
 <template>
 	<view class="qiun-columns">
-		<view class="qiun-padding" style="font-size: 32rpx;">
-			<text>{{tips}}</text>
-		</view>
 
 		<view class="qiun-bg-white qiun-title-bar qiun-common-mt">
 			<view class="qiun-title-dot-light">秒表 {{time}}</view>
@@ -13,18 +10,17 @@
 			</view>
 			
 			<view class="under-charts">{{time}}</view>
-		</view>
-		
-		
-		<view class="uni-flex uni-row" style="-webkit-justify-content: center;justify-content: center;">
-			<button class="success" type="primary" @tap="leftBtnTapped">{{leftBtnText}}</button>
-			<button class="test" type="warn" @tap="rightBtnTapped">{{rightBtnText}}</button>
+			
+			<view class="uni-flex uni-row" style="-webkit-justify-content: center;justify-content: center;">
+				<button class="test" type="primary" @tap="leftBtnTapped">{{leftBtnText}}</button>
+				<button class="test" type="warn" @tap="rightBtnTapped">{{rightBtnText}}</button>
+			</view>
 		</view>
 		
 		<view>
-			<uni-section title="记录" type="line">
-				<button type="primary" @tap="copyToClipboard">复制</button>
-				<button type="primary" @tap="save">保存</button>
+			<uni-section style="font-size: 34rpx;" title="记录" type="line">
+				<button class="operation" type="primary" @tap="copyToClipboard">复制</button>
+				<button class="operation" type="primary" @tap="save">保存</button>
 			</uni-section>
 			<uni-list>
 				<uni-list-item v-for="(item, index) in recordData" :key="index" :title="`计次 ${item.count}`" :rightText="formatTime(item.gap)" :showArrow="false"/>
@@ -94,10 +90,6 @@
 				}
 			}
 		},
-		computed: {
-			...mapState(["records"]),
-			...mapState(['testvuex'])
-		},
 		onLoad() {
 			console.log("It is load!");
 			_self = this;
@@ -130,8 +122,6 @@
 		},
 		
 		methods: {
-			...mapMutations(['shiftRecords']),
-			...mapGetters(['getRecordByTimestamp', 'getRecordByIndex']),
 			
 			formatTime(timestamp) {
 				return util.ms2msm(timestamp).slice(0, 8);
@@ -423,38 +413,27 @@
 </script>
 
 <style>
-	
-	.banner {
-		height: 360rpx;
-		overflow: hidden;
-		position: relative;
-		background-color: #ccc;
+	page {
+		background: #F2F2F2;
+		width: 750rpx;
+		overflow-x: hidden;
 	}
-	
-	.banner-img {
-		width: 100%;
-	}
-	
-	.banner-title {
-		max-height: 84rpx;
-		overflow: hidden;
-		position: absolute;
-		left: 30rpx;
-		bottom: 30rpx;
-		width: 90%;
-		font-size: 32rpx;
-		font-weight: 400;
-		line-height: 42rpx;
-		color: red;
-		z-index: 11;
-	}
-
-	
 	
 	.test {
+		margin-top: 8rpx;
 		width: 220rpx;
 		height: 75rpx;
 		line-height: 75rpx;
+		font-size: 30rpx;
+	}
+	
+	.operation {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 20%;
+		height: 80%;
+		margin-right: 10rpx;
 		font-size: 30rpx;
 	}
 	
@@ -463,54 +442,9 @@
 		height: 75rpx;
 		line-height: 75rpx;
 		font-size: 30rpx;
-		background-color: #4cd964;
+		/* background-color: #4cd964; */
 	}
 	
-	.text {
-		margin: 15rpx 10rpx;
-		padding: 0 20rpx;
-		background-color: #ebebeb;
-		height: 70rpx;
-		line-height: 70rpx;
-		text-align: center;
-		color: #777;
-		font-size: 26rpx;
-	}
-	
-	page {
-		background: #F2F2F2;
-		width: 750rpx;
-		overflow-x: hidden;
-	}
-
-	button {
-		margin-top: 20rpx;
-	}
-	
-
-	.button-sp-area {
-		margin: 0 auto;
-		width: 80%;
-	}
-
-	.mini-btn {
-		margin-right: 40rpx;
-	}
-
-	.qiun-padding {
-		padding: 2%;
-		width: 96%;
-	}
-
-	.qiun-wrap {
-		display: flex;
-		flex-wrap: wrap;
-	}
-
-	.qiun-rows {
-		display: flex;
-		flex-direction: row !important;
-	}
 
 	.qiun-columns {
 		display: flex;
@@ -541,9 +475,9 @@
 	/* 通用样式 */
 	.qiun-charts {
 		width: 750rpx;
-		height: 500rpx;
+		height: 600rpx;
 		position: relative;
-		background-color: rgba(255, 255, 255, 0);
+		background-color: rgba(255, 255, 255, 1);
 	}
 	
 	.under-charts {
@@ -551,7 +485,7 @@
 		overflow: hidden;
 		position: absolute;
 		left: 30rpx;
-		bottom: 130rpx;
+		bottom: 230rpx;
 		width: 90%;
 		font-size: 35rpx;
 		color: #2fc25b;
@@ -565,21 +499,4 @@
 		background-color: rgba(255, 255, 255, 1);
 	}
 
-
-	.qiun-tip {
-		display: block;
-		width: auto;
-		overflow: hidden;
-		padding: 15rpx;
-		height: 30rpx;
-		line-height: 30rpx;
-		margin: 10rpx;
-		background: #ff9933;
-		font-size: 30rpx;
-		border-radius: 8rpx;
-		justify-content: center;
-		text-align: center;
-		border: 1px solid #dc7004;
-		color: #FFFFFF;
-	}
 </style>
