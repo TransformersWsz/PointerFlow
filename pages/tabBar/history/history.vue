@@ -23,7 +23,6 @@
 			</uni-collapse>
 		</uni-swipe-action>
 
-		
 		<view class="uni-padding-wrap uni-common-mt">
 			<view class="uni-loadmore" v-if="showListLoadMore">{{listLoadMoreText}}</view>
 		</view>
@@ -153,11 +152,20 @@
 				}
 				else {
 					if (content.text === "复制") {
-						let strData = this.listData[index].recordData.map(item => `计次 ${item.count}\t\t${this.formatTime(item.gap)}`);
-						strData = strData.reverse().join("\n")
-						console.log(strData);
+						const recordData = this.listData[index].recordData;
+						let max_min_avg_mid = this.compute(recordData);
+						max_min_avg_mid = max_min_avg_mid.map(item => this.formatTime(item));
+						
+						const statistic = `最大值：${max_min_avg_mid[0]}\t最小值：${max_min_avg_mid[1]}\t平均值：${max_min_avg_mid[2]}\t中位数：${max_min_avg_mid[3]}`;
+						let strData = recordData.map(item => `计次 ${item.count}\t\t${this.formatTime(item.gap)}`);
+						let copyData = []
+						for (let i = 0; i < strData.length; i++) {
+							copyData.push(`${strData[i]}\t\t${statistic}`);
+						}
+						copyData = copyData.reverse().join("\n")
+						console.log(copyData);
 						uni.setClipboardData({
-							data: strData,
+							data: copyData,
 							success: () => {
 								uni.showToast({
 									title: '已复制到剪贴板',

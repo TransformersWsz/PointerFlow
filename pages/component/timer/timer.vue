@@ -79,15 +79,11 @@
 						categories: [
 							{
 								value: 0.1,
-								color: "#f04864"
+								color: "#2fc25b"
 							},
-							// {
-							// 	value: 0.8,
-							// 	color: "#2fc25b"
-							// },
 							{
 								value: 1,
-								color: "#f04864"
+								color: "#2fc25b"
 							}
 						],
 						series: [{
@@ -310,7 +306,7 @@
 							},
 							pointer: {
 								width: _self.gaugeWidth * 0.8 * _self.pixelRatio, //指针宽度
-								color: 'green'
+								color: '#00aaff'
 							}
 						}
 					},
@@ -558,7 +554,7 @@
 		bottom: 130rpx;
 		width: 90%;
 		font-size: 35rpx;
-		color: red;
+		color: #2fc25b;
 		background-color: rgba(34, 123, 233, -1);
 		z-index: 1;
 	}
