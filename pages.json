@@ -350,8 +350,13 @@
 		}
 	    ,{
             "path" : "pages/component/login/login",
-            "style" : {
-				"navigationBarTitleText": "爱计时"
+			"style": {
+				"backgroundColorTop": "#5677FC",
+				"backgroundColorBottom": "#ffffff",
+				"navigationBarTitleText": "",
+				"app-plus": {
+					"bounce": "vertical"
+				}
 			}
         },
 		{
@@ -1204,11 +1209,17 @@
 			]
 		}
 	],
+	"easycom": {
+		"autoscan": true,
+		"custom": {
+			"tui-(.*)": "@/components/thorui/tui-$1/tui-$1.vue"
+		}
+	},
 	"globalStyle": {
 		"pageOrientation": "portrait",
 		"navigationBarTextStyle": "white",
 		"navigationBarTitleText": "Hello uniapp",
-		"navigationBarBackgroundColor": "#007AFF",
+		"navigationBarBackgroundColor": "#5677FC",
 		"backgroundColor": "#F8F8F8",
 		"backgroundColorTop": "#F4F5F6",
 		"backgroundColorBottom": "#F4F5F6",

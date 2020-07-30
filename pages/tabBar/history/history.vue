@@ -1,5 +1,5 @@
 <template>
-	<view>
+	<view style="padding: 10rpx 20rpx;">
 		<uni-swipe-action style="margin-top: 30rpx;" v-for="(item, index) in listData" :key="index">
 			<uni-swipe-action-item :options="options" :show="isOpened" :auto-close="false" @click="swipeClick($event,index)">
 				<uni-list style="border-bottom-style: solid;border-bottom-width: 1px;">

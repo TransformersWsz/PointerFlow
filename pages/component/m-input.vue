@@ -6,6 +6,12 @@
 		<view v-if="clearable&&!displayable&&value.length" class="m-input-icon">
 			<m-icon color="#666666" type="clear" @click="clear"></m-icon>
 		</view>
+		
+		<view class="smscode">
+			<button type="default" >验证吗</button>
+		</view>
+		
+		
 		<view v-if="displayable" class="m-input-icon">
 			<m-icon :style="{color:showPassword?'#666666':'#cccccc'}" type="eye" @click="display"></m-icon>
 		</view>
@@ -99,6 +105,11 @@
 </script>
 
 <style>
+	.smscode {
+		
+		height: 50%;
+	}
+	
 	.m-input-view {
 		display: inline-flex;
 		flex-direction: row;
