@@ -36,6 +36,13 @@
 				code: ''
 			};
 		},
+		onBackPress() {
+			uni.showToast({
+				title: "确定返回吗？",
+				icon: "none"
+			})
+			return true;
+		},
 		methods: {
 			
 			getRandom: function(u) {
@@ -88,7 +95,7 @@
 					uni.showToast({
 						title: checkRes,
 						icon: "none"
-					})
+					});
 					// this.tui.toast(checkRes);
 				}
 			},

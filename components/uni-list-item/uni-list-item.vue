@@ -12,7 +12,7 @@
 				</view>
 				<view class="uni-list-item__content">
 					<slot />
-					<text class="uni-list-item__content-title">{{ title }}</text>
+					<text class="uni-list-item__content-title" :style="{fontSize: titleFontSize}">{{ title }}</text>
 					<text v-if="note" class="uni-list-item__content-note">{{ note }}</text>
 				</view>
 				<view class="uni-list-item__extra">
@@ -69,6 +69,10 @@
 				type: String,
 				default: ''
 			}, // 列表标题
+			titleFontSize: {
+				type: String,
+				default: '15px'
+			},
 			note: {
 				type: String,
 				default: ''
@@ -272,8 +276,12 @@
 	}
 
 	.uni-list-item__icon-img {
-		height: 26px;
-		width: 26px;
+		border-style: solid;
+		border-color: #dfe5fb;
+		border-width: 2px;
+		border-radius: 50%;
+		height: 80px;
+		width: 80px;
 	}
 
 	.uni-list-item__extra-text {

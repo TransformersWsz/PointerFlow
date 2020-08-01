@@ -285,6 +285,18 @@
 			}
 		},
 		{
+			"path": "pages/component/personal/personal",
+			"style": {
+				"navigationBarTitleText": "个人中心"
+			}
+		},
+		{
+			"path": "pages/component/feedback/feedback",
+			"style": {
+				"navigationBarTitleText": "问题反馈"
+			}
+		},
+		{
 			"path": "pages/component/visual/visual",
 			"style": {
 				"navigationBarTitleText": "数据分析"

@@ -2,7 +2,7 @@
 	<view style="padding: 10rpx 20rpx;">
 		<uni-swipe-action style="margin-top: 30rpx;" v-for="(item, index) in listData" :key="index">
 			<uni-swipe-action-item :options="options" :show="isOpened" :auto-close="false" @click="swipeClick($event,index)">
-				<uni-list style="border-bottom-style: solid;border-bottom-width: 1px;">
+				<uni-list style="border-bottom: 1px solid #e5e5e5;">
 					<uni-list-item :title="`保存时间: ${turnTs2Datetime(item.saveTimestamp)}`" :showMore="true" :showArrow="false" @clickIcon="clickIcon('asd')" />
 				</uni-list>
 			</uni-swipe-action-item>

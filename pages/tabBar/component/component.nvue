@@ -2,6 +2,7 @@
     <view class="uni-container">
 		
 		<button type="primary" @click="testHttps">test http</button>
+		<button type="primary" @click="toPersonal">personal</button>
 		
         <view class="uni-header-logo">
             <image class="uni-header-image" src="/static/componentIndex.png"></image>
@@ -156,6 +157,15 @@
             });
         },
         methods: {
+			toPersonal() {
+				console.log("hello login");
+				uni.navigateTo({
+				    url: '/pages/component/login/login',
+					fail: (e) => {
+						console.log(e);
+					}
+				})
+			},
 			
 			testHttps() {
 				
