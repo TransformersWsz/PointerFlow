@@ -30,7 +30,26 @@
             // #endif
         },
         onShow: function() {
-            console.log('App Show')
+            console.log('App Show');
+			const hasLogin = uni.getStorageSync("hasLogin");
+			if (!hasLogin) {
+				console.log("未登录");
+				uni.reLaunch({
+					url: "/pages/component/login/login",
+					success: (e) => {
+						console.log("跳转login成功");
+					},
+					fail: (e) => {
+						console.log(e);
+						console.log("跳转login失败");
+					}
+				});
+			}
+			else {
+				uni.getCurrentPages()
+				console.log("已经登录");
+			}
+			
         },
         onHide: function() {
             console.log('App Hide')

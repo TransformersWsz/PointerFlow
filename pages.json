@@ -367,7 +367,10 @@
 				"backgroundColorBottom": "#ffffff",
 				"navigationBarTitleText": "",
 				"app-plus": {
-					"bounce": "vertical"
+					"bounce": "vertical",
+					"titleNView": {
+						"autoBackButton": false
+					}
 				}
 			}
         },

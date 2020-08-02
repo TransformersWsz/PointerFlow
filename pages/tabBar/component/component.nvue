@@ -186,7 +186,7 @@
 				// });
 				
 				uni.request({
-					url: "http://139.224.110.171:8080/sms/sendSms",
+					url: "https://itime.cloud/sms/sendSms",
 					data: {
 						"phoneNumber": "13776103604"
 					},

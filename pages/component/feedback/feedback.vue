@@ -1,20 +1,20 @@
 <template>
     <view class="page">
         <view class='feedback-title'>
-            <text>问题和意见</text>
+            <text>问题描述</text>
             <text class="feedback-quick" @tap="chooseMsg">快速键入</text>
         </view>
         <view class="feedback-body">
-            <textarea placeholder="请详细描述你的问题和意见..." v-model="sendDate.content" class="feedback-textare"></textarea>
+            <textarea placeholder="请详细描述你的问题..." v-model="sendDate.content" class="feedback-textare"></textarea>
         </view>
         <view class='feedback-title'>
-            <text>图片(选填,提供问题截图,总大小10M以下)</text>
+            <text>图片(选填,提供问题截图)</text>
         </view>
         <view class="feedback-body feedback-uploader">
             <view class="uni-uploader">
                 <view class="uni-uploader-head">
                     <view class="uni-uploader-title">点击预览图片</view>
-                    <view class="uni-uploader-info">{{imageList.length}}/8</view>
+                    <view class="uni-uploader-info">{{imageList.length}}/5</view>
                 </view>
                 <view class="uni-uploader-body">
                     <view class="uni-uploader__files">
@@ -24,30 +24,16 @@
                                 <view class="close-view" @click="close(index)">x</view>
                             </view>
                         </block>
-                        <view class="uni-uploader__input-box" v-show="imageList.length < 8">
+                        <view class="uni-uploader__input-box" v-show="imageList.length < 5">
                             <view class="uni-uploader__input" @tap="chooseImg"></view>
                         </view>
                     </view>
                 </view>
             </view>
         </view>
-        <view class='feedback-title'>
-            <text>QQ/邮箱</text>
-        </view>
-        <view class="feedback-body">
-            <input class="feedback-input" v-model="sendDate.contact" placeholder="(选填,方便我们联系你 )" />
-        </view>
-        <view class='feedback-title feedback-star-view'>
-            <text>应用评分</text>
-            <view class="feedback-star-view">
-                <text class="feedback-star" v-for="(value,key) in stars" :key="key" :class="key < sendDate.score ? 'active' : ''"
-                    @tap="chooseStar(value)"></text>
-            </view>
-        </view>
+
         <button type="default" class="feedback-submit" @tap="send">提交</button>
-        <view class='feedback-title'>
-            <text>用户反馈的结果可在app打包后于DCloud开发者中心查看</text>
-        </view>
+
     </view>
 </template>
 

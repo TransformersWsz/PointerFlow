@@ -3,7 +3,7 @@
 		<view class="tui-bg-box">
 			<image src="/static/images/login/bg_login.png" class="tui-bg-img"></image>
 			<image src="/static/images/my/mine_def_touxiang_3x.png" class="tui-photo"></image>
-			<view class="tui-login-name">Thor UI</view>
+			<view class="tui-login-name">Timer</view>
 		</view>
 		<form :report-submit="true" @submit="formLogin">
 			<view class="tui-login-from">
@@ -37,11 +37,11 @@
 			};
 		},
 		onBackPress() {
-			uni.showToast({
-				title: "确定返回吗？",
-				icon: "none"
-			})
-			return true;
+			// uni.showToast({
+			// 	title: "确定返回吗？",
+			// 	icon: "none"
+			// })
+			// return true;
 		},
 		methods: {
 			
@@ -54,11 +54,7 @@
 				return rnd;
 			},
 			doLoop: function(seconds) {
-				let code = this.getRandom(6);
-				this.tui.toast('您本次的验证码是：' + code, 5000);
 				seconds = seconds ? seconds : 60;
-				this.btnText = seconds + 's后获取';
-				this.code = code;
 				let countdown = setInterval(() => {
 					if (seconds > 0) {
 						this.btnText = seconds + 's后获取';
@@ -87,6 +83,30 @@
 					this.disabled = true;
 					this.btnText = '请稍候...';
 					this.type = 'gray';
+					
+					uni.request({
+						url: "https://itime.cloud/sms/sendSms",
+						data: {
+							"phoneNumber": this.mobile
+						},
+						header: {
+							"content-type": "application/json"
+						},
+						method: "POST",
+						sslVerify: false,
+						// dataType: "json",
+						success: (res) => {
+							console.log("获取验证码成功");
+						},
+						fail: (error) => {
+							console.log(error);
+							uni.showToast({
+								title: "网络异常，请稍后再试",
+								icon: "none"
+							})
+						}
+					});
+					
 
 					setTimeout(() => {
 						this.doLoop(60);

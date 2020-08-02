@@ -258,7 +258,7 @@
 				}
 				else {    // 暂停计时
 					this.pauseCal();
-					this.isDisabled = false;
+					
 					this.leftBtnText = "启动";
 					this.rightBtnText = "复位";
 				}
@@ -397,7 +397,8 @@
 			},
 			
 			pauseCal() {    // 暂停计时
-			
+				this.isDisabled = false;
+				
 				clearInterval(this.timer_text);
 				clearInterval(this.timer_clock);
 				
@@ -440,7 +441,8 @@
 				this.ratio = 0;
 				this.timeValue = 0;
 				this.time = `00:00.00`;
-				this.recordData = []
+				this.recordData = [];
+				this.isDisabled = true;
 				canvasObj['canvasGauge'].updateData({    // 秒指针归0
 					series: [{
 						data: this.ratio
