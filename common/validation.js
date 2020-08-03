@@ -43,6 +43,9 @@ const form = {
 					case "isMobile":
 						isError = !form._isMobile(formData[key]);
 						break;
+					case "isSms":
+						isError = !form._isSms(formData[key]);
+						break;
 					case "isEmail":
 						isError = !form._isEmail(formData[key]);
 						break;
@@ -118,6 +121,9 @@ const form = {
 	},
 	_isMobile: function(value) {
 		return /^(?:13\d|14\d|15\d|16\d|17\d|18\d|19\d)\d{5}(\d{3}|\*{3})$/.test(value);
+	},
+	isSms: function(value) {
+		return /^\d{6}$/.test(value)
 	},
 	_isEmail: function(value) {
 		return /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/.test(value);

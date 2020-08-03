@@ -46,7 +46,6 @@
 				});
 			}
 			else {
-				uni.getCurrentPages()
 				console.log("已经登录");
 			}
 			

@@ -14,7 +14,7 @@
 				</view>
 				<view class="tui-line-cell tui-top28">
 					<tui-icon name="pwd" :size="20" color="#6d7a87"></tui-icon>
-					<input placeholder-class="tui-phcolor" class="tui-input" name="smsCode" placeholder="请输入验证码" maxlength="6" />
+					<input placeholder-class="tui-phcolor" class="tui-input" name="smsCode" placeholder="请输入验证码" maxlength="4" v-model="smsCode" type="number" />
 					<tui-button width="182rpx" height="56rpx" :size="24" :type="type" shape="circle" :plain="true" :disabled="disabled"
 					 @click="btnSend">{{ btnText }}</tui-button>
 				</view>
@@ -33,7 +33,7 @@
 				btnText: '获取验证码',
 				mobile: '',
 				type: 'primary',
-				code: ''
+				smsCode: ''
 			};
 		},
 		onBackPress() {
@@ -45,14 +45,6 @@
 		},
 		methods: {
 			
-			getRandom: function(u) {
-				let rnd = '';
-				u = u || 6;
-				for (var i = 0; i < u; i++) {
-					rnd += Math.floor(Math.random() * 10);
-				}
-				return rnd;
-			},
 			doLoop: function(seconds) {
 				seconds = seconds ? seconds : 60;
 				let countdown = setInterval(() => {
@@ -97,26 +89,26 @@
 						// dataType: "json",
 						success: (res) => {
 							console.log("获取验证码成功");
+							setTimeout(() => {
+								this.doLoop(60);
+							}, 500);
 						},
 						fail: (error) => {
 							console.log(error);
 							uni.showToast({
 								title: "网络异常，请稍后再试",
 								icon: "none"
-							})
+							});
+							this.disabled = false;
+							this.btnText = '获取验证码';
+							this.type = 'primary';
 						}
 					});
-					
-
-					setTimeout(() => {
-						this.doLoop(60);
-					}, 500);
 				} else {
 					uni.showToast({
 						title: checkRes,
 						icon: "none"
 					});
-					// this.tui.toast(checkRes);
 				}
 			},
 			formLogin: function(e) {
@@ -129,37 +121,63 @@
 					},
 					{
 						name: 'loginCode',
-						rule: ['required', 'isSame:code'],
-						msg: ['请输入验证码', '验证码不正确']
+						rule: ['required'],
+						msg: ['请输入验证码']
 					}
 				];
 				//进行表单检查
 				let formData = {
 					mobile: mobile,
-					loginCode: loginCode,
-					code: this.code
+					loginCode: loginCode
 				};
 				let checkRes = form.validation(formData, rules);
 				if (checkRes) {
-					this.tui.toast(checkRes);
+					uni.showToast({
+						title: checkRes,
+						icon: "none"
+					});
 					return;
 				}
-				let format = util.formatNumber(mobile);
-				uni.setStorageSync('thorui_mobile', format);
-				let state = {
-					mobile: format
-				};
-				this.login(state);
-				this.tui.toast('登录成功', 2000, true);
-				setTimeout(() => {
-					uni.reLaunch({
-						url: '/pages/tabbar/my/my'
-					});
-				}, 200);
-			},
-			protocol: function() {
-				uni.navigateTo({
-					url: '/pages/doc/protocol/protocol'
+				
+				uni.request({
+					url: "https://itime.cloud/sms/validateNum",
+					data: {
+						"phoneNumber": this.mobile,
+						"verifyCode": this.smsCode
+					},
+					header: {
+						"content-type": "application/json"
+					},
+					method: "POST",
+					sslVerify: false,
+					// dataType: "json",
+					success: (res) => {
+						if (res.data.result == "fail") {
+							uni.showToast({
+								title: "验证码错误",
+								icon: "none"
+							});
+						}
+						else {
+							uni.showToast({
+								title: "登录成功",
+								icon: "success"
+							});
+							uni.setStorageSync('hasLogin', true);
+							setTimeout(() => {
+								uni.reLaunch({
+									url: '/pages/component/timer/timer'
+								});
+							}, 200);
+						}
+					},
+					fail: (error) => {
+						console.log(error);
+						uni.showToast({
+							title: "网络异常，请稍后再试",
+							icon: "none"
+						})
+					}
 				});
 			}
 		}
@@ -261,15 +279,5 @@
 		margin-top: 100rpx;
 	}
 
-	.tui-protocol {
-		color: #333;
-		font-size: 24rpx;
-		text-align: center;
-		width: 100%;
-		margin-top: 29rpx;
-	}
 
-	.tui-protocol-red {
-		color: #f54f46;
-	}
 </style>
