@@ -163,7 +163,7 @@
 								title: "登录成功",
 								icon: "success"
 							});
-							uni.setStorageSync('hasLogin', true);
+							uni.setStorageSync('hasLogin', this.mobile);
 							setTimeout(() => {
 								uni.reLaunch({
 									url: '/pages/component/timer/timer'
