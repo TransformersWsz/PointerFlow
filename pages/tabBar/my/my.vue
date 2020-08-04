@@ -46,22 +46,15 @@
 					content: '确定退出登录？',
 					success: (res) => {
 						if (res.confirm) {
-							this.listData.splice(index, 1);
-							this.historyData.splice(index, 1);
 							uni.setStorage({
-								key: "history",
-								data: this.historyData,
+								key: "hasLogin",
+								data: "",
 								success: () => {
-									uni.showToast({
-										title: '删除成功',
-										icon: 'success',
-										mask: true,
-										duration: 2000,
-										success: () => {
-											console.log("save success");
-											console.log(uni.getStorageSync("history"));
-										}
-									});
+									setTimeout(() => {
+										uni.reLaunch({
+											url: '/pages/my/login/login'
+										});
+									}, 200);
 								}
 							});
 						} else if (res.cancel) {

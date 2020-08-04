@@ -64,7 +64,7 @@
 			}
 		}
 	    ,{
-            "path" : "pages/component/login/login",
+            "path" : "pages/my/login/login",
 			"style": {
 				"backgroundColorTop": "#5677FC",
 				"backgroundColorBottom": "#ffffff",
@@ -110,8 +110,8 @@
 		"backgroundColor": "#F8F8F8",
 		"list": [{
 				"pagePath": "pages/tabBar/timer/timer",
-				"iconPath": "static/component.png",
-				"selectedIconPath": "static/componentHL.png",
+				"iconPath": "static/timer.png",
+				"selectedIconPath": "static/timerHL.png",
 				"text": "计时器"
 			}, {
 				"pagePath": "pages/tabBar/history/history",

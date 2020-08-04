@@ -35,7 +35,7 @@
 			if (!hasLogin) {
 				console.log("未登录");
 				uni.reLaunch({
-					url: "/pages/component/login/login",
+					url: "/pages/my/login/login",
 					success: (e) => {
 						console.log("跳转login成功");
 					},
