@@ -5,7 +5,7 @@
             <text class="feedback-quick" @tap="chooseMsg">快速键入</text>
         </view>
         <view class="feedback-body">
-            <textarea placeholder="请详细描述你的问题..." v-model="sendDate.content" class="feedback-textare"></textarea>
+            <textarea placeholder="请详细描述你的问题..." v-model="advice" class="feedback-textare"></textarea>
         </view>
         <view class='feedback-title'>
             <text>图片(选填,提供问题截图)</text>
@@ -41,28 +41,12 @@
     export default {
         data() {
             return {
-                msgContents: ["界面显示错乱", "启动缓慢，卡出翔了", "UI无法直视，丑哭了", "偶发性崩溃"],
-                stars: [1, 2, 3, 4, 5],
-                imageList: [],
-                sendDate: {
-                    score: 0,
-                    content: "",
-                    contact: ""
-                }
+                msgContents: ["界面显示错乱", "app卡顿，启动缓慢", "app偶尔崩溃"],
+				advice: "",
+                imageList: []
             }
         },
         onLoad() {
-            let deviceInfo = {
-                appid: plus.runtime.appid,
-                imei: plus.device.imei, //设备标识
-                p: plus.os.name === "Android" ? "a" : "i", //平台类型，i表示iOS平台，a表示Android平台。
-                md: plus.device.model, //设备型号
-                app_version: plus.runtime.version,
-                plus_version: plus.runtime.innerVersion, //基座版本号
-                os: plus.os.version,
-                net: "" + plus.networkinfo.getCurrentType()
-            }
-            this.sendDate = Object.assign(deviceInfo, this.sendDate);
         },
         methods: {
             close(e) {
@@ -72,7 +56,7 @@
                 uni.showActionSheet({
                     itemList: this.msgContents,
                     success: (res) => {
-                        this.sendDate.content = this.msgContents[res.tapIndex];
+                        this.advice += this.msgContents[res.tapIndex];
                     }
                 })
             },
@@ -86,9 +70,6 @@
                     }
                 })
             },
-            chooseStar(e) { //点击评星
-                this.sendDate.score = e;
-            },
             previewImage(index) { //预览图片
                 uni.previewImage({
                     urls: this.imageList,
@@ -96,23 +77,16 @@
                 });
             },
             send() { //发送反馈
-                console.log(JSON.stringify(this.sendDate));
-                if (this.imageList.length === 0) {
+                
+                if (this.advice.length === 0) {
                     uni.showModal({
-                        content: '至少选择一张图片',
-                        showCancel: false
-                    })
-                    return
-                }
-                if (this.sendDate.content.length === 0) {
-                    uni.showModal({
-                        content: '请输入问题和意见',
+                        content: '请输入你的问题',
                         showCancel: false
                     })
                     return
                 }
                 uni.showLoading({
-                    title: '上传中...'
+                    title: '正在提交...'
                 })
                 let imgs = this.imageList.map((value, index) => {
                     return {
@@ -122,38 +96,34 @@
                 })
                 // TODO 服务端限制上传文件一次最大不超过 2M, 图片一次最多不超过5张
                 uni.uploadFile({
-                    url: "https://service.dcloud.net.cn/feedback",
+                    url: "https://itime.cloud/problem/upload",
                     files: imgs,
-                    formData: this.sendDate,
+                    formData: {
+						"advice": this.advice,
+						"phoneNumber": uni.getStorageSync("hasLogin")
+					},
                     success: (res) => {
-                        if (typeof res.data === 'string') {
-                            res.data = JSON.parse(res.data)
-                        }
-                        if (res.statusCode === 200 && res.data && res.data.ret === 0) {
-                            uni.showModal({
-                                content: '反馈成功',
-                                showCancel: false
-                            })
-                            this.imageList = [];
-                            this.sendDate = Object.assign({},{
-                                score: 0,
-                                content: "",
-                                contact: ""
-                            })
-                        } else if (res.statusCode !== 200){
-                            uni.showModal({
-                                content: '反馈失败，错误码为：' + res.statusCode,
-                                showCancel: false
-                            })
-                        } else {
-                            uni.showModal({
-                                content: '反馈失败',
-                                showCancel: false
-                            })
-                        }
+						console.log(res.data);
+						uni.showToast({
+							title: "提交成功",
+							icon: "success",
+							mask: true,
+							duration: 2000,
+							complete: () => {
+								setTimeout(()=>{
+									uni.navigateBack();
+								}, 1000);
+								
+							}
+						})
                     },
                     fail: (res) => {
-                        console.log(JSON.stringify(res))
+                        console.log(JSON.stringify(res));
+						uni.showModal({
+							title: "提交失败",
+							content: "网络异常，请稍后再试",
+							showCancel: false
+						});
                     },
                     complete() {
                         uni.hideLoading()

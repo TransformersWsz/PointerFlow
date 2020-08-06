@@ -38,7 +38,7 @@
 			}
 		},
 		{
-			"path": "pages/component/feedback/feedback",
+			"path": "pages/my/feedback/feedback",
 			"style": {
 				"navigationBarTitleText": "问题反馈"
 			}
@@ -58,12 +58,6 @@
 		},
 		// #endif
 		{
-			"path": "platforms/app-plus/feedback/feedback",
-			"style": {
-				"navigationBarTitleText": "问题反馈"
-			}
-		}
-	    ,{
             "path" : "pages/my/login/login",
 			"style": {
 				"backgroundColorTop": "#5677FC",

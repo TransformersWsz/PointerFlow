@@ -16,7 +16,7 @@
 				<uni-list-item title="最大值" :rightText="maxGap" :showArrow="false" />
 				<uni-list-item title="最小值" :rightText="minGap" :showArrow="false" />
 				<uni-list-item title="平均值" :rightText="avgGap" :showArrow="false" />
-				<uni-list-item title="中位数" :rightText="minGap" :showArrow="false" />
+				<uni-list-item title="中位数" :rightText="midGap" :showArrow="false" />
 			</uni-list>
 		</view>
 

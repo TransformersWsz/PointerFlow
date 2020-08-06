@@ -92,6 +92,7 @@
 				}
 			}
 		},
+		
 		onLoad() {
 			console.log("It is load!");
 			_self = this;
@@ -126,7 +127,6 @@
 						"gap": item.gap-item.gap%10
 					};
 				});
-				console.log(tempRecordData);
 				uni.setStorage({
 					key: "tempRecordData",
 					data: tempRecordData,
@@ -177,19 +177,7 @@
 					});
 				}
 				else {
-					let strData = this.recordData.map(item => `计次 ${item.count}\t\t${this.formatTime(item.gap)}`);
-					strData = strData.reverse().join("\n");
-					console.log(strData);
-					uni.setClipboardData({
-						data: strData,
-						success: () => {
-							uni.showToast({
-								title: '已复制到剪贴板',
-								icon: 'success',
-								mask: true
-							});
-						}
-					});
+					util.copyToClipboard(this.recordData);
 				}
 			},
 			
@@ -201,43 +189,54 @@
 					});
 				}
 				else {
-					try {
-						const item = {
-							saveTimestamp: Date.now(),
-							recordData: this.recordData
-						};
-					    let historyData = uni.getStorageSync("history");
-					    if (historyData) {
-					        historyData.unshift(item);
-					    }
-						else {
-							historyData = [item];
+					let data = {
+						"phoneNumber": uni.getStorageSync("hasLogin"),
+						"saveTimestamp": Date.now(),
+						"flag": 1,
+						"recordData": this.recordData.map(item => item.gap).reverse()
+					};
+					uni.showLoading({
+						title: "保存中",
+						mask: true
+					});
+					uni.request({
+						url: "https://itime.cloud/data/upload",
+						header: {
+							"content-type": "application/json"
+						},
+						method: "POST",
+						data: data,
+						sslVerify: false,
+						success: (res) => {
+							uni.showToast({
+								title: "保存成功",
+								icon: "success",
+								mask: true,
+								duration: 2000,
+								complete: () => {
+									setTimeout(()=>{    // 跳转到历史记录页面
+										uni.switchTab({
+											url: '/pages/tabBar/history/history',
+											complete: () => {
+												this.clearData();
+											}
+										});
+									}, 1000);
+								}
+							});	
+						},
+						fail: (error) => {
+							console.log(error);
+							uni.showModal({
+								title: "保存失败",
+								content: "网络异常，请稍后再试",
+								showCancel: false
+							});
+						},
+						complete: () => {
+							uni.hideLoading();
 						}
-						uni.setStorage({
-							key: "history",
-							data: historyData,
-							success: () => {
-								uni.showToast({
-									title: '保存成功',
-									icon: 'success',
-									mask: true,
-									duration: 2000,
-									success: () => {
-										console.log("save success");
-										console.log(uni.getStorageSync("history"));
-									}
-								});
-								setTimeout(()=>{    // 跳转到历史记录页面
-									uni.switchTab({
-										url: '/pages/tabBar/history/history'
-									})
-								}, 2000);
-							}
-						});
-					} catch (e) {
-						console.log(e)
-					    console.log("get history failure");
-					}
+					});
 				}
 			},
 			
@@ -372,15 +371,7 @@
 					
 					this.timeValue = timeKeeping;
 					this.time = this.formatTime(timeKeeping);
-					
-					// canvasObj['canvasGauge'].updateData({    // 秒指针转动(手机端指针旋转异常)
-					// 	title: {
-					// 		name: this.time,
-					// 		color: "#f04864",
-					// 		fontSize: 18 * _self.pixelRatio,
-					// 		offsetY: 50 * _self.pixelRatio, //新增参数，自定义调整Y轴文案距离
-					// 	}
-					// });
+				
 			
 				}, 10);
 				

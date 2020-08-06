@@ -56,50 +56,40 @@
 				
 				
 				listData: [],    // 列表数据
+				offset: 0,
+				limit: 3,
+				batchData: [],    // 从网络加载的批数据
 				historyData: [],    // 缓存数据
 				showListLoadMore: false,    // 显示加载更多字样
-				listLoadMoreText: "加载中...",
-				batchSize: 3
+				listLoadMoreText: "加载中..."
+				
 			}
 		},
 
 		onLoad() {
-			this.initData();
+			// this.initData();
 		},
 		onShow() {
 			console.log("history show");
 			this.initData();
 		},
-		onUnload() {
-			console.log("page unload");
-		},
+		
 		onReachBottom() {
-			console.log("onReachBottom");
-			if (this.listData.length >= this.historyData.length) {
-				this.listLoadMoreText = "没有更多数据了!";
-			}
-			else {
-				this.showListLoadMore = true;
-				setTimeout(() => {
-					this.setListData();
-				}, 300);
-			}
+			
+			setTimeout(() => {
+				this.setListData();
+			}, 300);
 			
 		},
+		
 		onPullDownRefresh() {
 			console.log('onPullDownRefresh');
 			this.initData();
 		},
+		
 		methods: {
 			compute(recordData) {
-				let arr = recordData.map(item => item.gap);
-				arr.sort((a, b) => a-b);
-				console.log(arr);
-				const maxGap = arr[arr.length-1];
-				const minGap = arr[0];
-				const avgGap = (arr.reduce((prev,current,index,arr) => { return prev+current }) / arr.length).toFixed(2);
-				const midGap = arr[Math.floor(arr.length/2)];
-				return [maxGap, minGap, avgGap, midGap];
+				return util.compute(recordData);
 			},
 			
 			formatTime(timestamp) {
@@ -115,7 +105,12 @@
 				const minute = date.getMinutes();
 				const second = date.getSeconds();
 				
-				return `${year}/${month}/${day}  ${hour}:${minute}`;
+				let s = `${year}/${month}/${day}  ${hour}:${minute}`;
+				if (minute < 10) {
+					s = `${year}/${month}/${day}  ${hour}:0${minute}`;
+				}
+				
+				return s;
 			},
 			
 			swipeClick(e, index) {
@@ -151,33 +146,27 @@
 					});
 				}
 				else {
+					const tempRecordData = this.listData[index].recordData.map(item => {
+						return {
+							"count": item.count, 
+							"gap": item.gap-item.gap%10
+						};
+					});
 					if (content.text === "复制") {
-						const recordData = this.listData[index].recordData;
-						let max_min_avg_mid = this.compute(recordData);
-						max_min_avg_mid = max_min_avg_mid.map(item => this.formatTime(item));
-						
-						const statistic = `最大值：${max_min_avg_mid[0]}\t最小值：${max_min_avg_mid[1]}\t平均值：${max_min_avg_mid[2]}\t中位数：${max_min_avg_mid[3]}`;
-						let strData = recordData.map(item => `计次 ${item.count}\t\t${this.formatTime(item.gap)}`);
-						let copyData = []
-						for (let i = 0; i < strData.length; i++) {
-							copyData.push(`${strData[i]}\t\t${statistic}`);
-						}
-						copyData = copyData.reverse().join("\n");
-						uni.setClipboardData({
-							data: copyData,
-							success: () => {
-								uni.showToast({
-									title: '已复制到剪贴板',
-									icon: 'success',
-									mask: true
-								});
-							}
-						})
+						console.log(tempRecordData);
+						util.copyToClipboard(tempRecordData);
 					}
 					else {    // 数据分析
-						uni.navigateTo({
-							url: `/pages/history/visual/visual?index=${index}`
-						})
+						
+						uni.setStorage({
+							key: "tempRecordData",
+							data: tempRecordData,
+							success: () => {
+								uni.navigateTo({
+									url: `/pages/history/visual/visual`
+								})
+							}
+						});
 					}
 				}
 			},
@@ -185,6 +174,7 @@
 			clickIcon(e) {
 				console.log(e);
 			},
+			
 			triggerCollapse(e) {
 				if (!this.list[e].pages) {
 					this.goDetailPage(this.list[e].url);
@@ -198,36 +188,118 @@
 					}
 				}
 			},
+			
 			initData() {
+				
+				this.offset = 0;
 				setTimeout(() => {
-					try {
-						this.listData = [];
-					    this.historyData = uni.getStorageSync("history");
-					    if (this.historyData) {
-							const length = this.listData.length;
-					        this.listData = this.listData.concat(this.historyData.slice(length, length+this.batchSize));
-							if (this.listData.length >= this.historyData.length) {    // 数据量太少，初始的时候一下子全部加载出来了
+					uni.request({
+						url: "https://itime.cloud/data/loadRecord",
+						data: {
+							"phoneNumber": uni.getStorageSync("hasLogin"),
+							"limit": this.limit,
+							"offset": this.offset
+						},
+						header: {
+							"content-type": "application/json"
+						},
+						method: "POST",
+						sslVerify: false,
+						success: (res) => {
+							if (res.data.msg == "success") {
+								let tmpData = res.data.data;    // 按照倒序来
+								if (tmpData.length == 0) {
+									this.listLoadMoreText = "尚无历史记录";
+								}
+								else {
+									if (tmpData.length < this.limit) {
+										this.listLoadMoreText = "没有更多数据了!";
+										this.showListLoadMore = false;
+									}
+									else {
+										this.showListLoadMore = true;
+									}
+									tmpData = tmpData.map(item => {
+										let tmpItem = {
+											"saveTimestamp": item.saveTimestamp,
+											"recordData": item.recordData.map((gap, idx) => {
+												return {
+													"count": idx+1,
+													"gap": gap
+												}
+											})
+										};
+										return tmpItem;
+									});
+									this.listData = tmpData;
+									this.offset = this.listData.length;
+								}
+								
+							}
+						},
+						fail: (error) => {
+							console.log(error);
+							uni.showToast({
+								title: "网络异常，请稍后再试",
+								icon: "none"
+							});
+						},
+						complete: () => {
+							uni.stopPullDownRefresh();
+						}
+					});
+				}, 300);
+			},
+			
+			setListData() {
+				uni.request({
+					url: "https://itime.cloud/data/loadRecord",
+					data: {
+						"phoneNumber": uni.getStorageSync("hasLogin"),
+						"limit": this.limit,
+						"offset": this.offset
+					},
+					header: {
+						"content-type": "application/json"
+					},
+					method: "POST",
+					sslVerify: false,
+					success: (res) => {
+						if (res.data.msg == "success") {
+							let tmpData = res.data.data;    // 按照倒序来
+							
+							tmpData = tmpData.map(item => {
+								let tmpItem = {
+									"saveTimestamp": item.saveTimestamp,
+									"recordData": item.recordData.map((gap, idx) => {
+										return {
+											"count": idx+1,
+											"gap": gap
+										}
+									})
+								};
+								return tmpItem;
+							});
+							this.listData = this.listData.concat(tmpData);
+							this.offset = this.listData.length;
+							
+							if (tmpData.length < this.limit) {
+								this.listLoadMoreText = "没有更多数据了!";
 								this.showListLoadMore = false;
 							}
 							else {
 								this.showListLoadMore = true;
-								this.listLoadMoreText = "加载更多";
 							}
-					    }
-						else {
-							this.listLoadMoreText = "尚无历史记录";
 						}
-					} catch (e) {
-						console.log(e)
-					    console.log("get history failure");
-					} finally {
-						uni.stopPullDownRefresh();
+					},
+					fail: (error) => {
+						console.log(error);
+						uni.showToast({
+							title: "网络异常，请稍后再试",
+							icon: "none"
+						});
 					}
-				}, 300);
-			},
-			setListData() {
-				const length = this.listData.length;
-				this.listData = this.listData.concat(this.historyData.slice(length, length+this.batchSize));
+				});
 			}
 		}
 	}

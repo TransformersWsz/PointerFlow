@@ -34,7 +34,7 @@
 			toFeedBack() {
 				console.log("go to fd");
 				uni.navigateTo({
-					url: "/pages/component/feedback/feedback"
+					url: "/pages/my/feedback/feedback"
 				})
 			},
 			toLogin() {

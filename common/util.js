@@ -59,6 +59,40 @@ function ms2msm(timestamp) { // 将时间戳转换为分钟、秒、毫秒: 00.0
 	return `${minute}:${second}.${millisecond}`.slice(0, 8);
 }
 
+function compute(recordData) {
+	let arr = recordData.map(item => item.gap);
+	arr.sort((a, b) => a-b);
+	const maxGap = arr[arr.length-1];
+	const minGap = arr[0];
+	const avgGap = parseFloat((arr.reduce((prev,current,index,arr) => { return prev+current }) / arr.length).toFixed(2));
+	const midGap = arr[Math.floor(arr.length/2)];
+	
+	return [maxGap, minGap, avgGap, midGap];
+}
+
+function copyToClipboard(recordData) {
+	let max_min_avg_mid = compute(recordData);
+	max_min_avg_mid = max_min_avg_mid.map(item => ms2msm(item).slice(0, 8));
+	
+	const statistic = `最大值：${max_min_avg_mid[0]}\t最小值：${max_min_avg_mid[1]}\t平均值：${max_min_avg_mid[2]}\t中位数：${max_min_avg_mid[3]}`;
+	let strData = recordData.map(item => `计次 ${item.count}\t\t${ms2msm(item.gap).slice(0, 8)}`);
+	let copyData = []
+	for (let i = 0; i < strData.length; i++) {
+		copyData.push(`${strData[i]}\t\t${statistic}`);
+	}
+	copyData = copyData.reverse().join("\n");
+	uni.setClipboardData({
+		data: copyData,
+		success: () => {
+			uni.showToast({
+				title: '已复制到剪贴板',
+				icon: 'success',
+				mask: true
+			});
+		}
+	});
+}
+
 var dateUtils = {
 	UNITS: {
 		'年': 31557600000,
@@ -98,6 +132,8 @@ var dateUtils = {
 
 module.exports = {
 	formatTime: formatTime,
+	compute: compute,
+	copyToClipboard: copyToClipboard,
 	formatLocation: formatLocation,
 	ms2msm: ms2msm,
 	dateUtils: dateUtils
